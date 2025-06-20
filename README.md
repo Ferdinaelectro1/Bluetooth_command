@@ -2,6 +2,16 @@
 
 A new Flutter project.
 
+## This is a simple flutter bluetooth command app
+
+For build this project : `flutter pub get && flutter run`
+
+For contribut , clone this project : `git clone https://github.com/Ferdinaelectro1/Bluetooth_command.git`
+
+### Screenshoot for this apk
+
+![alt text](docs/screenshot.png)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
