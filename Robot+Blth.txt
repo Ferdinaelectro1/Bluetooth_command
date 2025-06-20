@@ -1,0 +1,111 @@
+#include <Servo.h>
+#include <SoftwareSerial.h>
+
+// Déclaration du port série pour le Bluetooth
+SoftwareSerial BTSerial(10, 11); // RX | TX
+
+// Déclaration des servomoteurs
+Servo servo1, servo2, servo3, servo4;
+
+// Définition des positions initiales (mises à jour)
+int pos1 = 90;
+int pos2 = 50;
+int pos3 = 0;
+int pos4 = 90;
+
+// Variables pour la communication Bluetooth
+String inputString = "";
+bool stringComplete = false;
+
+void setup() {
+  // Initialisation des servos
+  servo1.attach(2);
+  servo2.attach(3);
+  servo3.attach(4);
+  servo4.attach(5);
+
+  servo1.write(pos1);
+  servo2.write(pos2);
+  servo3.write(pos3);
+  servo4.write(pos4);
+
+  // Ports série
+  Serial.begin(9600);      // Moniteur série (USB)
+  BTSerial.begin(9600);    // Communication avec le module HC-05/HC-06
+
+  Serial.println("Bluetooth ready");
+  BTSerial.println("Bluetooth module ready");
+}
+
+// Fonction de mouvement progressif
+void moveServo(Servo &servo, int start, int end, int step, int delayTime) {
+  if (start < end) {
+    for (int pos = start; pos <= end; pos += step) {
+      servo.write(pos);
+      delay(delayTime);
+    }
+  } else {
+    for (int pos = start; pos >= end; pos -= step) {
+      servo.write(pos);
+      delay(delayTime);
+    }
+  }
+}
+
+// MODULE 1 - ouverture
+void module1() {
+  moveServo(servo3, 0, 170, 1, 15);
+  moveServo(servo4, 90, 0, 1, 15);
+  BTSerial.println("Module 1 exécuté");
+}
+
+// MODULE 2 - fermeture bras
+void module2() {
+  moveServo(servo1, 90, 40, 1, 15);
+  moveServo(servo2, 50, 110, 1, 15);
+  BTSerial.println("Module 2 exécuté");
+}
+
+// MODULE 3 - retour à la position initiale
+void module3() {
+  moveServo(servo4, 0, 90, 1, 15);
+  moveServo(servo3, 170, 0, 1, 15);
+  moveServo(servo1, 40, 90, 1, 15);
+  moveServo(servo2, 110, 50, 1, 15);
+  BTSerial.println("Module 3 exécuté");
+}
+
+void loop() {
+  // Si une commande est prête
+  if (stringComplete) {
+    inputString.trim(); // Nettoie les espaces
+
+    Serial.print("Commande reçue : ");
+    Serial.println(inputString);
+
+    // Exécution de la commande
+    if (inputString == "module1") {
+      module1();
+    } else if (inputString == "module2") {
+      module2();
+    } else if (inputString == "module3") {
+      module3();
+    } else {
+      BTSerial.println("Commande inconnue.");
+    }
+
+    // Réinitialisation
+    inputString = "";
+    stringComplete = false;
+  }
+
+  // Lecture des données Bluetooth
+  while (BTSerial.available()) {
+    char inChar = (char)BTSerial.read();
+    if (inChar == '\n') {
+      stringComplete = true;
+    } else {
+      inputString += inChar;
+    }
+  }
+}

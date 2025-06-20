@@ -1,0 +1,5 @@
+- Changer l'icone de chargement
+- Ajouter provider
+- Scanner les bluetooth et permettre de se connecter à un bluetooth spécifique
+- Utiliser une autre apk pour tester ou un autre phone
+- AJouter le barre de progression circulaire lors de l'exécution d'un module
